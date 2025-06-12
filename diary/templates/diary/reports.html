@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Relatórios - Finance Diary{% endblock %}
+
+{% block content %}
+<div class="reports-container">
+    <!-- Cabeçalho -->
+    <div class="header-section">
+        <div class="header-back">
+            <a href="{% url 'diary:dashboard' %}" class="back-link">
+                <span class="material-icons">arrow_back</span>
+                Dashboard
+            </a>
+        </div>
+        <h1>Relatórios Financeiros</h1>
+    </div>
+
+    <!-- Seleção de período -->
+    <div class="period-selector">
+        <div class="card">
+            <div class="card-content">
+                <h3>Período</h3>
+                <div class="period-buttons">
+                    <button data-period="monthly" class="period-button active">Mensal</button>
+                    <button data-period="quarterly" class="period-button">Trimestral</button>
+                    <button data-period="yearly" class="period-button">Anual</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos principais -->
+    <div class="main-charts">
+        <div class="card">
+            <div class="card-content">
+                <h3 id="reportTitle">Relatório Mensal</h3>
+                <div class="chart-container large">
+                    <canvas id="reportChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos de análise -->
+    <div class="analysis-charts">
+        <div class="card">
+            <div class="card-content">
+                <h3>Distribuição de Despesas</h3>
+                <div id="categoryAnalysisContainer" class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-content">
+                <h3>Tendência de Gastos</h3>
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let reportChart = null;
+let categoryChart = null;
+let trendChart = null;
+let currentPeriod = 'monthly';
+
+function generateColors(count) {
+    const baseColors = [
+        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+        '#FF9F40', '#8CD9B3', '#FFCC80', '#B39DDB', '#81D4FA'
+    ];
+    const colors = [];
+    for (let i = 0; i < count; i++) {
+        colors.push(baseColors[i % baseColors.length]);
+    }
+    return colors;
+}
+
+function renderCharts(data) {
+    // Destroy previous charts if exist
+    if (reportChart) reportChart.destroy();
+    if (categoryChart) categoryChart.destroy();
+    if (trendChart) trendChart.destroy();
+
+    const labels = data.labels;
+
+    reportChart = new Chart(document.getElementById('reportChart'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Receitas',
+                    data: data.income,
+                    borderColor: '#4CAF50',
+                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                },
+                {
+                    label: 'Despesas',
+                    data: data.expense,
+                    borderColor: '#F44336',
+                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                },
+                {
+                    label: 'Saldo',
+                    data: data.balance,
+                    borderColor: '#2196F3',
+                    backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                    tension: 0.3,
+                    borderDash: [5, 5],
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    const categories = data.category_data || [];
+    const categoryLabels = categories.map(item => item.category);
+    const categoryValues = categories.map(item => item.amount);
+    const categoryColors = generateColors(categoryLabels.length);
+
+    categoryChart = new Chart(document.getElementById('categoryChart'), {
+        type: 'doughnut',
+        data: {
+            labels: categoryLabels,
+            datasets: [{
+                data: categoryValues,
+                backgroundColor: categoryColors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'right' }
+            }
+        }
+    });
+
+    trendChart = new Chart(document.getElementById('trendChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Despesas',
+                data: data.expense,
+                backgroundColor: '#F44336'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+}
+
+function loadReportData(period) {
+    fetch(`/reports/data/${period}/`)
+        .then(response => response.json())
+        .then(data => {
+            renderCharts(data);
+        });
+}
+
+function setupPeriodSelector() {
+    const buttons = document.querySelectorAll('.period-button');
+    buttons.forEach(button => {
+        button.addEventListener('click', function () {
+            buttons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            currentPeriod = this.dataset.period;
+            loadReportData(currentPeriod);
+
+            const reportTitle = document.getElementById('reportTitle');
+            if (currentPeriod === 'monthly') {
+                reportTitle.textContent = 'Relatório Mensal';
+            } else if (currentPeriod === 'quarterly') {
+                reportTitle.textContent = 'Relatório Trimestral';
+            } else if (currentPeriod === 'yearly') {
+                reportTitle.textContent = 'Relatório Anual';
+            }
+        });
+    });
+}
+
+// Inicialização
+window.addEventListener('DOMContentLoaded', () => {
+    setupPeriodSelector();
+    loadReportData('monthly');
+});
+</script>
+{% endblock %}

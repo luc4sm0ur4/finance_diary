@@ -1,0 +1,157 @@
+/* Cores base */
+:root {
+    --color-bg-light: #ffffff;
+    --color-surface-light: #f7f7f7;
+    --color-text-primary-light: #121212;
+    --color-text-secondary-light: #666;
+    --color-border-light: #e0e0e0;
+    --color-primary-light: #2196F3;
+    --color-income-light: #4CAF50;
+    --color-expense-light: #F44336;
+
+    --color-bg-dark: #191919;
+    --color-surface-dark: #232323;
+    --color-text-primary-dark: #e6e6e6;
+    --color-text-secondary-dark: #a0a0a0;
+    --color-border-dark: #333;
+    --color-primary-dark: #3ea6ff;
+    --color-income-dark: #5eb762;
+    --color-expense-dark: #f36259;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    background-color: var(--color-bg-light);
+    color: var(--color-text-primary-light);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark-mode {
+    background-color: var(--color-bg-dark);
+    color: var(--color-text-primary-dark);
+}
+
+.sidebar {
+    width: 240px;
+    background-color: var(--color-surface-light);
+    border-right: 1px solid var(--color-border-light);
+    position: fixed;
+    height: 100vh;
+}
+
+body.dark-mode .sidebar {
+    background-color: var(--color-surface-dark);
+    border-color: var(--color-border-dark);
+}
+
+.sidebar-menu li a {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    text-decoration: none;
+    color: inherit;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.sidebar-menu li a:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .sidebar-menu li a:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-menu li a.active {
+    font-weight: 600;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .sidebar-menu li a.active {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.content {
+    margin-left: 240px;
+    padding: 20px;
+}
+
+.card {
+    background-color: var(--color-surface-light);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    transition: background-color 0.3s;
+}
+
+body.dark-mode .card {
+    background-color: var(--color-surface-dark);
+}
+
+.add-button, .submit-button, .cancel-button {
+    padding: 10px 16px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border: none;
+}
+
+.add-button {
+    background-color: var(--color-primary-light);
+    color: white;
+}
+
+body.dark-mode .add-button {
+    background-color: var(--color-primary-dark);
+}
+
+.submit-button {
+    background-color: var(--color-income-light);
+    color: white;
+}
+
+body.dark-mode .submit-button {
+    background-color: var(--color-income-dark);
+}
+
+.cancel-button {
+    background-color: transparent;
+    border: 1px solid var(--color-border-light);
+    color: var(--color-text-primary-light);
+}
+
+body.dark-mode .cancel-button {
+    border-color: var(--color-border-dark);
+    color: var(--color-text-primary-dark);
+}
+
+.transaction-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+body.dark-mode .transaction-item {
+    border-color: var(--color-border-dark);
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 70px;
+    }
+
+    .content {
+        margin-left: 70px;
+    }
+
+    .sidebar-menu li a span:not(.material-icons) {
+        display: none;
+    }
+
+    .sidebar-footer {
+        display: none;
+    }
+}

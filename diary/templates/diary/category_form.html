@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<h2>{{ title }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn">Salvar</button>
+    <a href="{% url 'diary:category_list' %}">Cancelar</a>
+</form>
+
+<datalist id="icon-list">
+  <option value="receipt">
+  <option value="shopping_cart">
+  <option value="attach_money">
+  <option value="fastfood">
+  <option value="credit_card">
+  <option value="home">
+  <option value="car_repair">
+  <option value="restaurant">
+  <option value="school">
+  <option value="wifi">
+</datalist>
+{% endblock %}
