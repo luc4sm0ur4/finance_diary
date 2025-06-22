@@ -214,3 +214,20 @@ def profile(request):
     else:
         form = UserChangeForm(instance=request.user)
     return render(request, 'diary/profile.html', {'form': form})
+
+@login_required
+def edit_transaction(request, transaction_id):
+    transaction = get_object_or_404(Transaction, id=transaction_id, user=request.user)
+
+    if request.method == 'POST':
+        form = TransactionForm(request.POST, instance=transaction, user=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('diary:dashboard')
+    else:
+        form = TransactionForm(instance=transaction, user=request.user)
+
+    return render(request, 'diary/edit_transaction.html', {
+        'form': form,
+        'transaction': transaction
+    })

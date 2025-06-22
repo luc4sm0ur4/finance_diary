@@ -108,7 +108,10 @@
                             </div>
                         </div>
                         <div class="transaction-actions">
-                            <a href="{% url 'diary:delete_transaction' transaction.id %}" class="delete-transaction" data-id="{{ transaction.id }}" title="Excluir">
+                            <a href="{% url 'diary:edit_transaction' transaction.id %}" class="edit-transaction" title="Editar" style="color: #24A646; margin-right: 10px;">
+                                <span class="material-icons">edit</span>
+                            </a>
+                            <a href="{% url 'diary:delete_transaction' transaction.id %}" class="delete-transaction" title="Excluir" style="color: #D73131;">
                                 <span class="material-icons">delete</span>
                             </a>
                         </div>
