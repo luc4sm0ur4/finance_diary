@@ -1,4 +1,7 @@
 from django import forms
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserChangeForm
+
 from .models import Transaction, Category, Goal
 
 class TransactionForm(forms.ModelForm):
@@ -6,25 +9,11 @@ class TransactionForm(forms.ModelForm):
         model = Transaction
         fields = ['amount', 'description', 'date', 'category', 'transaction_type']
         widgets = {
-            'date': forms.DateInput(attrs={
-                'type': 'date',
-                'class': 'form-control'
-            }),
-            'amount': forms.NumberInput(attrs={
-                'step': '0.01',
-                'min': '0.01',
-                'class': 'form-control'
-            }),
-            'description': forms.TextInput(attrs={
-                'placeholder': 'Descrição da transação',
-                'class': 'form-control'
-            }),
-            'transaction_type': forms.Select(attrs={
-                'class': 'form-control'
-            }),
-            'category': forms.Select(attrs={
-                'class': 'form-control'
-            }),
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'amount': forms.NumberInput(attrs={'step': '0.01', 'min': '0.01', 'class': 'form-control'}),
+            'description': forms.TextInput(attrs={'placeholder': 'Descrição da transação', 'class': 'form-control'}),
+            'transaction_type': forms.Select(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
         }
         labels = {
             'amount': 'Valor',
@@ -47,15 +36,8 @@ class CategoryForm(forms.ModelForm):
         model = Category
         fields = ['name', 'icon']
         widgets = {
-            'name': forms.TextInput(attrs={
-                'placeholder': 'Nome da categoria',
-                'class': 'form-control'
-            }),
-            'icon': forms.TextInput(attrs={
-                'placeholder': 'Ícone (Material Icons)',
-                'list': 'icon-list',
-                'class': 'form-control'
-            }),
+            'name': forms.TextInput(attrs={'placeholder': 'Nome da categoria', 'class': 'form-control'}),
+            'icon': forms.TextInput(attrs={'placeholder': 'Ícone (Material Icons)', 'list': 'icon-list', 'class': 'form-control'}),
         }
         labels = {
             'name': 'Nome',
@@ -74,19 +56,9 @@ class GoalForm(forms.ModelForm):
         model = Goal
         fields = ['title', 'target_amount', 'target_date']
         widgets = {
-            'title': forms.TextInput(attrs={
-                'placeholder': 'Meta (ex: Economizar para viagem)',
-                'class': 'form-control'
-            }),
-            'target_amount': forms.NumberInput(attrs={
-                'step': '0.01',
-                'min': '0.01',
-                'class': 'form-control'
-            }),
-            'target_date': forms.DateInput(attrs={
-                'type': 'date',
-                'class': 'form-control'
-            }),
+            'title': forms.TextInput(attrs={'placeholder': 'Meta (ex: Economizar para viagem)', 'class': 'form-control'}),
+            'target_amount': forms.NumberInput(attrs={'step': '0.01', 'min': '0.01', 'class': 'form-control'}),
+            'target_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
         labels = {
             'title': 'Título',
@@ -99,3 +71,21 @@ class GoalForm(forms.ModelForm):
         if amount and amount <= 0:
             raise forms.ValidationError('O valor deve ser maior que zero.')
         return amount
+
+
+class UserProfileForm(UserChangeForm):
+    password = None  # oculta o campo de senha
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+        labels = {
+            'first_name': 'Nome',
+            'last_name': 'Sobrenome',
+            'email': 'E-mail',
+        }
+        widgets = {
+            'first_name': forms.TextInput(attrs={'placeholder': 'Seu nome', 'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'placeholder': 'Seu sobrenome', 'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'seu@email.com', 'class': 'form-control'}),
+        }

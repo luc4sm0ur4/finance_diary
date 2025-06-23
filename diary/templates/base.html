@@ -22,11 +22,24 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .navbar .brand {
             font-size: 1.5rem;
             font-weight: bold;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar .nav-links a,
+        .navbar .nav-links form {
+            margin: 0;
         }
 
         .navbar .nav-links a {
@@ -81,6 +94,7 @@
         <a href="{% url 'diary:reports' %}">Relatórios</a>
         <a href="{% url 'diary:add_transaction' %}">Nova Transação</a>
         <a href="{% url 'diary:category_list' %}">Categorias</a>
+        <a href="{% url 'diary:goal_list' %}">Metas</a> <!-- Botão de Metas adicionado -->
         <a href="{% url 'diary:profile' %}">Perfil</a>
         {% if user.is_authenticated %}
         <form action="{% url 'users:logout' %}" method="post" style="display:inline;">

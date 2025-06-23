@@ -6,11 +6,10 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from calendar import monthrange
 from django.contrib import messages
-from django.contrib.auth.forms import UserChangeForm
 import json
 
 from .models import Transaction, Category, Goal
-from .forms import TransactionForm, CategoryForm, GoalForm
+from .forms import TransactionForm, CategoryForm, GoalForm, UserProfileForm
 
 
 @login_required
@@ -201,11 +200,13 @@ def edit_category(request, pk):
 @login_required
 def profile(request):
     if request.method == 'POST':
-        form = UserChangeForm(request.POST, instance=request.user)
+        form = UserProfileForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Perfil atualizado com sucesso!')
+            return redirect('diary:profile')
     else:
-        form = UserChangeForm(instance=request.user)
+        form = UserProfileForm(instance=request.user)
     return render(request, 'diary/profile.html', {'form': form})
 
 
@@ -259,8 +260,7 @@ def edit_goal(request, pk):
 @login_required
 def toggle_goal_status(request, pk):
     goal = get_object_or_404(Goal, pk=pk, user=request.user)
-
     if request.method == 'POST':
-        goal.achieved = not goal.achieved  # ✅ CORRIGIDO
+        goal.achieved = not goal.achieved
         goal.save()
     return redirect('diary:goal_list')
