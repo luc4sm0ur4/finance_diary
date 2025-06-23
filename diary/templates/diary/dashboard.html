@@ -148,77 +148,91 @@
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    setupFormHandlers();
-    setupDeleteHandlers();
-
+document.addEventListener('DOMContentLoaded', function () {
     fetch('{% url "diary:get_report_data" "monthly" %}')
         .then(response => response.json())
-        .then(data => setupCashFlowChart(data));
+        .then(data => {
+            setupCashFlowChart(data);
+        });
 
-    const expenseCategoryData = JSON.parse('{{ expense_by_category|escapejs }}');
+    const expenseCategoryData = JSON.parse('{{ expense_by_category|escapejs|safe }}');
     setupCategoryChart(expenseCategoryData);
 });
 
 function setupCashFlowChart(data) {
-    new Chart(document.getElementById('cashFlowChart').getContext('2d'), {
+    const ctx = document.getElementById('cashFlowChart').getContext('2d');
+    new Chart(ctx, {
         type: 'line',
         data: {
             labels: data.labels,
             datasets: [
-                { label: 'Receitas', data: data.income, borderColor: '#4CAF50', fill: true },
-                { label: 'Despesas', data: data.expense, borderColor: '#F44336', fill: true },
-                { label: 'Saldo', data: data.balance, borderColor: '#2196F3', borderDash: [5,5], fill: false }
+                {
+                    label: 'Receitas',
+                    data: data.income,
+                    borderColor: '#4CAF50',
+                    fill: false,
+                    tension: 0.3
+                },
+                {
+                    label: 'Despesas',
+                    data: data.expense,
+                    borderColor: '#F44336',
+                    fill: false,
+                    tension: 0.3
+                },
+                {
+                    label: 'Saldo',
+                    data: data.balance,
+                    borderColor: '#2196F3',
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0.3
+                }
             ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            }
         }
     });
 }
 
-function setupCategoryChart(expenseCategoryData) {
-    if (!expenseCategoryData.length) return;
+function setupCategoryChart(data) {
+    if (!data.length) return;
     const ctx = document.getElementById('expenseCategoryChart').getContext('2d');
-    const labels = expenseCategoryData.map(item => item.category);
-    const data = expenseCategoryData.map(item => item.amount);
+    const labels = data.map(item => item.category);
+    const values = data.map(item => item.amount);
 
     new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: labels,
-            datasets: [{ data: data, backgroundColor: generateColors(labels.length) }]
+            datasets: [{
+                data: values,
+                backgroundColor: generateColors(values.length)
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
         }
     });
 }
 
 function generateColors(count) {
-    const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
-    while (colors.length < count) {
-        colors.push(`hsl(${Math.random() * 360}, 70%, 50%)`);
+    const baseColors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#00C49F'];
+    while (baseColors.length < count) {
+        baseColors.push(`hsl(${Math.random() * 360}, 70%, 50%)`);
     }
-    return colors;
-}
-
-function setupFormHandlers() {
-    document.getElementById('addTransactionBtn').addEventListener('click', function() {
-        document.getElementById('transactionFormContainer').classList.remove('hidden');
-        this.classList.add('hidden');
-    });
-    document.getElementById('cancelTransactionBtn').addEventListener('click', function() {
-        document.getElementById('transactionFormContainer').classList.add('hidden');
-        document.getElementById('addTransactionBtn').classList.remove('hidden');
-    });
-}
-
-function setupDeleteHandlers() {
-    document.querySelectorAll('.delete-transaction').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (confirm('Tem certeza que deseja excluir esta transação?')) {
-                fetch(this.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                    .then(response => response.json())
-                    .then(data => { if (data.status === 'success') this.closest('.transaction-item').remove(); });
-            }
-        });
-    });
+    return baseColors;
 }
 </script>
 {% endblock %}

@@ -54,15 +54,17 @@ class CategoryForm(forms.ModelForm):
 class GoalForm(forms.ModelForm):
     class Meta:
         model = Goal
-        fields = ['title', 'target_amount', 'target_date']
+        fields = ['title', 'target_amount', 'current_amount', 'target_date']
         widgets = {
             'title': forms.TextInput(attrs={'placeholder': 'Meta (ex: Economizar para viagem)', 'class': 'form-control'}),
             'target_amount': forms.NumberInput(attrs={'step': '0.01', 'min': '0.01', 'class': 'form-control'}),
+            'current_amount': forms.NumberInput(attrs={'step': '0.01', 'min': '0.00', 'class': 'form-control'}),
             'target_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
         labels = {
             'title': 'Título',
             'target_amount': 'Valor Alvo (R$)',
+            'current_amount': 'Valor Atual (R$)',
             'target_date': 'Data Alvo',
         }
 

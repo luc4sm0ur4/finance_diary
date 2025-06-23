@@ -28,6 +28,7 @@ urlpatterns = [
     path('goals/', views.goal_list, name='goal_list'),
     path('goals/add/', views.add_goal, name='add_goal'),
     path('goals/edit/<int:pk>/', views.edit_goal, name='edit_goal'),
+    path('goals/delete/<int:pk>/', views.delete_goal, name='delete_goal'),  # <-- esta linha
     path('goals/toggle/<int:pk>/', views.toggle_goal_status, name='toggle_goal_status'),
 ]
 

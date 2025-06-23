@@ -342,3 +342,18 @@ label {
         align-items: flex-start;
     }
 }
+
+/* ---------- AJUSTES DE GRÁFICOS (Dashboard) ---------- */
+.chart-container {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 1rem 0;
+}
+
+#expenseCategoryChart,
+#cashFlowChart {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 320px;
+}

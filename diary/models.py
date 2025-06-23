@@ -50,8 +50,9 @@ class Goal(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     target_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    current_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # novo campo
     target_date = models.DateField()
-    achieved = models.BooleanField(default=False)  # ← CAMPO NOVO
+    achieved = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

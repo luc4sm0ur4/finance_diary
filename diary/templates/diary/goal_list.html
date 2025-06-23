@@ -23,22 +23,33 @@
             <a href="?status=concluidas" class="{% if selected_status == 'concluidas' %}active{% endif %}">Concluídas</a>
         </div>
 
-
         <ul class="goal-list">
             {% for goal in goals %}
             <li class="goal-item">
                 <div class="goal-info">
-                    <form action="{% url 'diary:toggle_goal_status' goal.pk %}" method="post">
+                    <form action="{% url 'diary:toggle_goal_status' goal.pk %}" method="post" style="margin: 0; display: flex; align-items: flex-start; gap: 0.8rem;">
                         {% csrf_token %}
                         <input type="checkbox" onchange="this.form.submit()" {% if goal.achieved %}checked{% endif %}>
-                        <strong>{{ goal.title }}</strong> —
-                        Valor: R$ {{ goal.target_amount|floatformat:2 }} até {{ goal.target_date|date:"d/m/Y" }}
+                        <div>
+                            <strong>{{ goal.title }}</strong><br>
+                            <small>
+                                Valor alvo: <strong>R$ {{ goal.target_amount|floatformat:2 }}</strong><br>
+                                Valor atual: <strong>R$ {{ goal.current_amount|floatformat:2 }}</strong><br>
+                                Data alvo: {{ goal.target_date|date:"d/m/Y" }}
+                            </small>
+                        </div>
                     </form>
                 </div>
                 <div class="goal-actions">
-                    <a href="{% url 'diary:edit_goal' goal.pk %}" class="btn">
+                    <a href="{% url 'diary:edit_goal' goal.pk %}" class="btn" title="Editar">
                         <span class="material-icons">edit</span>
                     </a>
+                    <form method="post" action="{% url 'diary:delete_goal' goal.pk %}" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir esta meta?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn" style="background-color: #D73131;" title="Excluir">
+                            <span class="material-icons">delete</span>
+                        </button>
+                    </form>
                 </div>
             </li>
             {% empty %}

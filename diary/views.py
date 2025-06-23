@@ -43,7 +43,10 @@ def dashboard(request):
         'income_sum': income_sum,
         'expense_sum': expense_sum,
         'balance': balance,
-        'expense_by_category': json.dumps(expense_by_category),
+        'expense_by_category': json.dumps([
+            {'category': c['category'], 'amount': c['amount']}
+            for c in expense_by_category
+        ]),
         'categories': categories,
         'transaction_form': TransactionForm(user=request.user),
         'category_form': CategoryForm(),
@@ -263,4 +266,12 @@ def toggle_goal_status(request, pk):
     if request.method == 'POST':
         goal.achieved = not goal.achieved
         goal.save()
+    return redirect('diary:goal_list')
+
+@login_required
+def delete_goal(request, pk):
+    goal = get_object_or_404(Goal, pk=pk, user=request.user)
+    if request.method == 'POST':
+        goal.delete()
+        messages.success(request, 'Meta excluída com sucesso!')
     return redirect('diary:goal_list')

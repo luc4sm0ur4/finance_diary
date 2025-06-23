@@ -94,7 +94,7 @@
         <a href="{% url 'diary:reports' %}">Relatórios</a>
         <a href="{% url 'diary:add_transaction' %}">Nova Transação</a>
         <a href="{% url 'diary:category_list' %}">Categorias</a>
-        <a href="{% url 'diary:goal_list' %}">Metas</a> <!-- Botão de Metas adicionado -->
+        <a href="{% url 'diary:goal_list' %}">Metas</a>
         <a href="{% url 'diary:profile' %}">Perfil</a>
         {% if user.is_authenticated %}
         <form action="{% url 'users:logout' %}" method="post" style="display:inline;">
@@ -111,6 +111,8 @@
     {% block content %}
     {% endblock %}
 </div>
+
+{% block scripts %}{% endblock %}
 
 </body>
 </html>
