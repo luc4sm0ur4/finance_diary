@@ -1,5 +1,5 @@
 from django import forms
-from .models import Transaction, Category
+from .models import Transaction, Category, Goal
 
 class TransactionForm(forms.ModelForm):
     class Meta:
@@ -35,15 +35,10 @@ class TransactionForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        # Captura o usuário passado como argumento
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        
-        # Filtra as categorias apenas do usuário logado
         if user:
             self.fields['category'].queryset = Category.objects.filter(user=user).order_by('name')
-        
-        # Torna a categoria opcional
         self.fields['category'].required = False
 
 
@@ -58,7 +53,7 @@ class CategoryForm(forms.ModelForm):
             }),
             'icon': forms.TextInput(attrs={
                 'placeholder': 'Ícone (Material Icons)',
-                'list': 'icon-list',  # permite usar <datalist> no template
+                'list': 'icon-list',
                 'class': 'form-control'
             }),
         }
@@ -72,3 +67,35 @@ class CategoryForm(forms.ModelForm):
         if not name:
             raise forms.ValidationError('O nome da categoria é obrigatório.')
         return name
+
+
+class GoalForm(forms.ModelForm):
+    class Meta:
+        model = Goal
+        fields = ['title', 'target_amount', 'target_date']
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'placeholder': 'Meta (ex: Economizar para viagem)',
+                'class': 'form-control'
+            }),
+            'target_amount': forms.NumberInput(attrs={
+                'step': '0.01',
+                'min': '0.01',
+                'class': 'form-control'
+            }),
+            'target_date': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control'
+            }),
+        }
+        labels = {
+            'title': 'Título',
+            'target_amount': 'Valor Alvo (R$)',
+            'target_date': 'Data Alvo',
+        }
+
+    def clean_target_amount(self):
+        amount = self.cleaned_data.get('target_amount')
+        if amount and amount <= 0:
+            raise forms.ValidationError('O valor deve ser maior que zero.')
+        return amount

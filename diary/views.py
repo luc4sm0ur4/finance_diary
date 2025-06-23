@@ -1,5 +1,3 @@
-### ARQUIVO: views.py
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -11,8 +9,9 @@ from django.contrib import messages
 from django.contrib.auth.forms import UserChangeForm
 import json
 
-from .models import Transaction, Category
-from .forms import TransactionForm, CategoryForm
+from .models import Transaction, Category, Goal
+from .forms import TransactionForm, CategoryForm, GoalForm
+
 
 @login_required
 def dashboard(request):
@@ -54,6 +53,7 @@ def dashboard(request):
 
     return render(request, 'diary/dashboard.html', context)
 
+
 @login_required
 def add_transaction(request):
     if request.method == 'POST':
@@ -62,29 +62,40 @@ def add_transaction(request):
             transaction = form.save(commit=False)
             transaction.user = request.user
             transaction.save()
-
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({'status': 'success'})
+    return redirect('diary:dashboard')
 
-            return redirect('diary:dashboard')  # <- corrigido
-    return redirect('diary:dashboard')  # <- corrigido
 
 @login_required
 def delete_transaction(request, transaction_id):
-    try:
-        transaction = Transaction.objects.get(id=transaction_id, user=request.user)
-        transaction.delete()
-
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'status': 'success'})
-
-        messages.success(request, 'Transação excluída com sucesso.')
-    except Transaction.DoesNotExist:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'status': 'not_found'}, status=404)
-        messages.error(request, 'Transação não encontrada.')
-
+    transaction = get_object_or_404(Transaction, id=transaction_id, user=request.user)
+    transaction.delete()
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'status': 'success'})
     return redirect('diary:dashboard')
+
+
+@login_required
+def edit_transaction(request, transaction_id):
+    transaction = get_object_or_404(Transaction, id=transaction_id, user=request.user)
+    if request.method == 'POST':
+        form = TransactionForm(request.POST, instance=transaction, user=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('diary:dashboard')
+    else:
+        form = TransactionForm(instance=transaction, user=request.user)
+    return render(request, 'diary/edit_transaction.html', {
+        'form': form,
+        'transaction': transaction
+    })
+
+
+@login_required
+def reports(request):
+    return render(request, 'diary/reports.html')
+
 
 @login_required
 def get_report_data(request, report_type):
@@ -124,19 +135,6 @@ def get_report_data(request, report_type):
             data['expense'].append(expense)
             data['balance'].append(income - expense)
 
-        category_totals = []
-        for category in Category.objects.filter(user=request.user):
-            total = Transaction.objects.filter(
-                user=request.user,
-                category=category,
-                transaction_type='expense',
-                date__gte=start_date,
-                date__lte=today
-            ).aggregate(Sum('amount'))['amount__sum'] or 0
-            if total > 0:
-                category_totals.append({'category': category.name, 'amount': float(total)})
-        data['category_data'] = category_totals
-
     elif report_type in ['quarterly', 'yearly']:
         months = 3 if report_type == 'quarterly' else 12
         for i in reversed(range(months)):
@@ -153,30 +151,23 @@ def get_report_data(request, report_type):
             data['expense'].append(expense)
             data['balance'].append(income - expense)
 
-        category_totals = []
-        period_start = today - timedelta(days=90 if report_type == 'quarterly' else 365)
-        for category in Category.objects.filter(user=request.user):
-            total = Transaction.objects.filter(
-                user=request.user,
-                category=category,
-                transaction_type='expense',
-                date__gte=period_start,
-                date__lte=today
-            ).aggregate(Sum('amount'))['amount__sum'] or 0
-            if total > 0:
-                category_totals.append({'category': category.name, 'amount': float(total)})
-        data['category_data'] = category_totals
+    for category in Category.objects.filter(user=request.user):
+        total = Transaction.objects.filter(
+            user=request.user,
+            category=category,
+            transaction_type='expense'
+        ).aggregate(Sum('amount'))['amount__sum'] or 0
+        if total > 0:
+            data['category_data'].append({'category': category.name, 'amount': float(total)})
 
     return JsonResponse(data)
 
-@login_required
-def reports(request):
-    return render(request, 'diary/reports.html')
 
 @login_required
 def category_list(request):
     categories = Category.objects.filter(user=request.user).order_by('name')
     return render(request, 'diary/category_list.html', {'categories': categories})
+
 
 @login_required
 def add_category(request):
@@ -192,6 +183,7 @@ def add_category(request):
         form = CategoryForm()
     return render(request, 'diary/category_form.html', {'form': form, 'title': 'Nova Categoria'})
 
+
 @login_required
 def edit_category(request, pk):
     category = get_object_or_404(Category, pk=pk, user=request.user)
@@ -205,6 +197,7 @@ def edit_category(request, pk):
         form = CategoryForm(instance=category)
     return render(request, 'diary/category_form.html', {'form': form, 'title': 'Editar Categoria'})
 
+
 @login_required
 def profile(request):
     if request.method == 'POST':
@@ -215,19 +208,59 @@ def profile(request):
         form = UserChangeForm(instance=request.user)
     return render(request, 'diary/profile.html', {'form': form})
 
-@login_required
-def edit_transaction(request, transaction_id):
-    transaction = get_object_or_404(Transaction, id=transaction_id, user=request.user)
 
+# ==== METAS FINANCEIRAS ====
+
+@login_required
+def goal_list(request):
+    status = request.GET.get('status', 'todas')
+    goals = Goal.objects.filter(user=request.user)
+
+    if status == 'pendentes':
+        goals = goals.filter(achieved=False)
+    elif status == 'concluidas':
+        goals = goals.filter(achieved=True)
+
+    return render(request, 'diary/goal_list.html', {
+        'goals': goals,
+        'selected_status': status,
+    })
+
+
+@login_required
+def add_goal(request):
     if request.method == 'POST':
-        form = TransactionForm(request.POST, instance=transaction, user=request.user)
+        form = GoalForm(request.POST)
+        if form.is_valid():
+            goal = form.save(commit=False)
+            goal.user = request.user
+            goal.save()
+            messages.success(request, 'Meta adicionada com sucesso!')
+            return redirect('diary:goal_list')
+    else:
+        form = GoalForm()
+    return render(request, 'diary/goal_form.html', {'form': form, 'title': 'Nova Meta'})
+
+
+@login_required
+def edit_goal(request, pk):
+    goal = get_object_or_404(Goal, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = GoalForm(request.POST, instance=goal)
         if form.is_valid():
             form.save()
-            return redirect('diary:dashboard')
+            messages.success(request, 'Meta atualizada com sucesso!')
+            return redirect('diary:goal_list')
     else:
-        form = TransactionForm(instance=transaction, user=request.user)
+        form = GoalForm(instance=goal)
+    return render(request, 'diary/goal_form.html', {'form': form, 'title': 'Editar Meta'})
 
-    return render(request, 'diary/edit_transaction.html', {
-        'form': form,
-        'transaction': transaction
-    })
+
+@login_required
+def toggle_goal_status(request, pk):
+    goal = get_object_or_404(Goal, pk=pk, user=request.user)
+
+    if request.method == 'POST':
+        goal.achieved = not goal.achieved  # ✅ CORRIGIDO
+        goal.save()
+    return redirect('diary:goal_list')

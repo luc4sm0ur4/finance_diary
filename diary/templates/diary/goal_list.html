@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Metas Financeiras{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-content">
+        <a href="{% url 'diary:dashboard' %}" class="back-link">
+            <span class="material-icons">arrow_back</span> Voltar ao Dashboard
+        </a>
+
+        <h1>Metas Financeiras</h1>
+
+        <div class="goals-header">
+            <h2>Minhas Metas</h2>
+            <a href="{% url 'diary:add_goal' %}" class="add-button">+ Nova Meta</a>
+        </div>
+
+        <div class="goal-filters spaced-filters">
+            <a href="?status=todas" class="{% if selected_status == 'todas' %}active{% endif %}">Todas</a>
+            <a href="?status=pendentes" class="{% if selected_status == 'pendentes' %}active{% endif %}">Pendentes</a>
+            <a href="?status=concluidas" class="{% if selected_status == 'concluidas' %}active{% endif %}">Concluídas</a>
+        </div>
+
+
+        <ul class="goal-list">
+            {% for goal in goals %}
+            <li class="goal-item">
+                <div class="goal-info">
+                    <form action="{% url 'diary:toggle_goal_status' goal.pk %}" method="post">
+                        {% csrf_token %}
+                        <input type="checkbox" onchange="this.form.submit()" {% if goal.achieved %}checked{% endif %}>
+                        <strong>{{ goal.title }}</strong> —
+                        Valor: R$ {{ goal.target_amount|floatformat:2 }} até {{ goal.target_date|date:"d/m/Y" }}
+                    </form>
+                </div>
+                <div class="goal-actions">
+                    <a href="{% url 'diary:edit_goal' goal.pk %}" class="btn">
+                        <span class="material-icons">edit</span>
+                    </a>
+                </div>
+            </li>
+            {% empty %}
+            <li class="goal-item">Nenhuma meta encontrada para este filtro.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

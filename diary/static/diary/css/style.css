@@ -138,6 +138,145 @@ body.dark-mode .transaction-item {
     border-color: var(--color-border-dark);
 }
 
+/* ---------- ESTILOS DE METAS FINANCEIRAS ---------- */
+.goal-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+}
+
+.goal-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--color-surface-light);
+    padding: 1rem;
+    border: 1px solid var(--color-border-light);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    transition: background-color 0.3s, border 0.3s;
+}
+
+body.dark-mode .goal-item {
+    background-color: var(--color-surface-dark);
+    border: 1px solid var(--color-border-dark);
+}
+
+.goal-info {
+    flex: 1;
+    font-size: 1rem;
+    color: var(--color-text-primary-light);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+body.dark-mode .goal-info {
+    color: var(--color-text-primary-dark);
+}
+
+.goal-info strong {
+    font-size: 1.1rem;
+    color: var(--color-primary-light);
+}
+
+body.dark-mode .goal-info strong {
+    color: var(--color-primary-dark);
+}
+
+.goal-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: 1rem;
+}
+
+.goal-actions .btn {
+    background-color: var(--color-primary-light);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+body.dark-mode .goal-actions .btn {
+    background-color: var(--color-primary-dark);
+}
+
+.goal-actions .btn:hover {
+    background-color: var(--color-income-light);
+}
+
+body.dark-mode .goal-actions .btn:hover {
+    background-color: var(--color-income-dark);
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 1rem;
+    color: var(--color-primary-light);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+body.dark-mode .back-link {
+    color: var(--color-primary-dark);
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* Botão de Nova Meta e filtros */
+.goals-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.goal-filters {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.goal-filters a {
+    text-decoration: none;
+    font-weight: 500;
+    color: var(--color-text-secondary-light);
+    transition: color 0.2s;
+}
+
+.goal-filters a:hover {
+    color: var(--color-text-primary-light);
+}
+
+.goal-filters a.active {
+    color: var(--color-income-light);
+}
+
+body.dark-mode .goal-filters a {
+    color: var(--color-text-secondary-dark);
+}
+
+body.dark-mode .goal-filters a:hover {
+    color: var(--color-text-primary-dark);
+}
+
+body.dark-mode .goal-filters a.active {
+    color: var(--color-income-dark);
+}
+
+/* Correção de sobreposição visual */
+.spaced-filters {
+    margin-top: 1rem;
+}
+
+/* ---------- RESPONSIVO ---------- */
 @media (max-width: 768px) {
     .sidebar {
         width: 70px;
@@ -153,5 +292,11 @@ body.dark-mode .transaction-item {
 
     .sidebar-footer {
         display: none;
+    }
+
+    .goals-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
     }
 }
