@@ -85,7 +85,7 @@ python manage.py runserver
 📄 Licença
 ----------
 
-MIT License - Veja [LICENSE](https://LICENSE) para detalhes.
+GPL-3.0 License - Veja [LICENSE]([https://LICENSE](https://www.gnu.org/licenses/gpl-3.0.html)) para detalhes.
 
 ✉️ Contato
 ----------
