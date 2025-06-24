@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="header-section">
+        <h1>{{ title }}</h1>
+        <a href="{% url 'diary:goal_list' %}" class="back-link">
+            ← Voltar para a lista
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-content">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="{{ form.title.id_for_label }}">Título</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="error">{{ form.title.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.target_amount.id_for_label }}">Valor Alvo (R$)</label>
+                    {{ form.target_amount }}
+                    {% if form.target_amount.errors %}
+                        <div class="error">{{ form.target_amount.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.current_amount.id_for_label }}">Valor Atual (R$)</label>
+                    {{ form.current_amount }}
+                    {% if form.current_amount.errors %}
+                        <div class="error">{{ form.current_amount.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.target_date.id_for_label }}">Data Alvo</label>
+                    {{ form.target_date }}
+                    {% if form.target_date.errors %}
+                        <div class="error">{{ form.target_date.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn">Salvar</button>
+                    <a href="{% url 'diary:goal_list' %}" class="btn cancel-button">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

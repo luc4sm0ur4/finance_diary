@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Finance Diary{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'diary/css/style.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f8fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #163546;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .navbar .brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar .nav-links a,
+        .navbar .nav-links form {
+            margin: 0;
+        }
+
+        .navbar .nav-links a {
+            color: white;
+            margin-right: 1rem;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .navbar .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        a {
+            color: #24A646;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            background-color: #24A646;
+            color: white;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #279E8F;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="brand">Finance Diary</div>
+    <div class="nav-links">
+        <a href="{% url 'diary:dashboard' %}">Dashboard</a>
+        <a href="{% url 'diary:reports' %}">Relatórios</a>
+        <a href="{% url 'diary:add_transaction' %}">Nova Transação</a>
+        <a href="{% url 'diary:category_list' %}">Categorias</a>
+        <a href="{% url 'diary:goal_list' %}">Metas</a>
+        <a href="{% url 'diary:profile' %}">Perfil</a>
+        {% if user.is_authenticated %}
+        <form action="{% url 'users:logout' %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn">Sair</button>
+        </form>
+        {% else %}
+            <a href="{% url 'users:login' %}">Entrar</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="container">
+    {% block content %}
+    {% endblock %}
+</div>
+
+{% block scripts %}{% endblock %}
+
+</body>
+</html>

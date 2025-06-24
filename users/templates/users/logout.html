@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Logout - Finance Diary{% endblock %}
+
+{% block content %}
+<div class="logout-page">
+    <h2>Você saiu da sua conta.</h2>
+    <p>Até logo! Esperamos ver você em breve. 😊</p>
+    <a href="{% url 'users:login' %}" class="btn">Fazer login novamente</a>
+</div>
+{% endblock %}
