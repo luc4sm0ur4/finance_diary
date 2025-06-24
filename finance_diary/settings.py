@@ -64,8 +64,12 @@ WSGI_APPLICATION = 'finance_diary.wsgi.application'
 # Banco de dados
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'finance_diary_db',
+        'USER': 'finance_user',
+        'PASSWORD': '@Luc4sM0ur42k25',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
