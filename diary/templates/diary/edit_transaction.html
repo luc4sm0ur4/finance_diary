@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Transação{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Editar Transação</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-grid">
+            {% for field in form.visible_fields %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'diary:dashboard' %}" class="btn cancel-button">Cancelar</a>
+            <button type="submit" class="btn submit-button">Salvar</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
