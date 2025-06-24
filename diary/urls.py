@@ -1,10 +1,18 @@
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
 from . import views_api
 
+from rest_framework.routers import DefaultRouter
+
 app_name = 'diary'
+
+# Router para ViewSets da API
+router = DefaultRouter()
+router.register(r'api/transactions', views_api.TransactionViewSet, basename='api-transaction')
+router.register(r'api/categories', views_api.CategoryViewSet, basename='api-category')
+router.register(r'api/goals', views_api.GoalViewSet, basename='api-goal')
 
 urlpatterns = [
     # Dashboard e relatórios
@@ -32,15 +40,8 @@ urlpatterns = [
     path('goals/delete/<int:pk>/', views.delete_goal, name='delete_goal'),
     path('goals/toggle/<int:pk>/', views.toggle_goal_status, name='toggle_goal_status'),
 
-    # ===== API REST (v1) =====
-    path('api/transactions/', views_api.TransactionListCreateAPIView.as_view(), name='api_transactions_list_create'),
-    path('api/transactions/<int:pk>/', views_api.TransactionRetrieveUpdateDestroyAPIView.as_view(), name='api_transactions_detail'),
-
-    path('api/categories/', views_api.CategoryListCreateAPIView.as_view(), name='api_categories_list_create'),
-    path('api/categories/<int:pk>/', views_api.CategoryRetrieveUpdateDestroyAPIView.as_view(), name='api_categories_detail'),
-
-    path('api/goals/', views_api.GoalListCreateAPIView.as_view(), name='api_goals_list_create'),
-    path('api/goals/<int:pk>/', views_api.GoalRetrieveUpdateDestroyAPIView.as_view(), name='api_goals_detail'),
+    # Rotas da API RESTful com ViewSets
+    path('', include(router.urls)),
 ]
 
 if settings.DEBUG:

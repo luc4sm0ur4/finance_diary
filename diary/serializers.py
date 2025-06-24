@@ -2,35 +2,33 @@ from rest_framework import serializers
 from .models import Transaction, Category, Goal
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ['id', 'name', 'icon']
-
-
 class TransactionSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(read_only=True)
-    category_id = serializers.PrimaryKeyRelatedField(
-        queryset=Category.objects.all(),
-        source='category',
-        write_only=True,
-        required=False
-    )
-
     class Meta:
         model = Transaction
         fields = [
             'id',
+            'user',
             'amount',
             'description',
             'date',
-            'transaction_type',
             'category',
-            'category_id',
+            'transaction_type',
             'created_at',
-            'updated_at'
+            'updated_at',
         ]
-        read_only_fields = ['created_at', 'updated_at']
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = [
+            'id',
+            'user',
+            'name',
+            'icon',
+        ]
+        read_only_fields = ['id', 'user']
 
 
 class GoalSerializer(serializers.ModelSerializer):
@@ -38,6 +36,7 @@ class GoalSerializer(serializers.ModelSerializer):
         model = Goal
         fields = [
             'id',
+            'user',
             'title',
             'description',
             'target_amount',
@@ -45,6 +44,6 @@ class GoalSerializer(serializers.ModelSerializer):
             'target_date',
             'achieved',
             'created_at',
-            'updated_at'
+            'updated_at',
         ]
-        read_only_fields = ['created_at', 'updated_at']
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at']

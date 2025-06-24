@@ -1,23 +1,20 @@
-from rest_framework import generics, permissions
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework import status
-
+from rest_framework import viewsets, permissions
 from .models import Transaction, Category, Goal
 from .serializers import TransactionSerializer, CategorySerializer, GoalSerializer
-from . import views_api
 
-
-# Permissão personalizada (somente do próprio usuário)
+# Permissão personalizada: só permite acessar/editar dados do próprio usuário
 class IsOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.user == request.user
 
+# ========================
+#        VIEWSETS
+# ========================
 
-# ===== TRANSAÇÕES =====
-class TransactionListCreateAPIView(generics.ListCreateAPIView):
+# TRANSAÇÕES
+class TransactionViewSet(viewsets.ModelViewSet):
     serializer_class = TransactionSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
 
     def get_queryset(self):
         return Transaction.objects.filter(user=self.request.user).order_by('-date')
@@ -25,20 +22,10 @@ class TransactionListCreateAPIView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-
-class TransactionRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = TransactionSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwner]
-    lookup_field = 'pk'
-
-    def get_queryset(self):
-        return Transaction.objects.filter(user=self.request.user)
-
-
-# ===== CATEGORIAS =====
-class CategoryListCreateAPIView(generics.ListCreateAPIView):
+# CATEGORIAS
+class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
 
     def get_queryset(self):
         return Category.objects.filter(user=self.request.user).order_by('name')
@@ -46,32 +33,13 @@ class CategoryListCreateAPIView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-
-class CategoryRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwner]
-    lookup_field = 'pk'
-
-    def get_queryset(self):
-        return Category.objects.filter(user=self.request.user)
-
-
-# ===== METAS FINANCEIRAS =====
-class GoalListCreateAPIView(generics.ListCreateAPIView):
+# METAS FINANCEIRAS
+class GoalViewSet(viewsets.ModelViewSet):
     serializer_class = GoalSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
 
     def get_queryset(self):
         return Goal.objects.filter(user=self.request.user).order_by('-target_date')
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-
-class GoalRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = GoalSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwner]
-    lookup_field = 'pk'
-
-    def get_queryset(self):
-        return Goal.objects.filter(user=self.request.user)

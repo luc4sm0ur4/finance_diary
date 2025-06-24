@@ -17,7 +17,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Terceiros
     'rest_framework',
+    'django_filters',
 
     # Apps locais
     'users',
@@ -66,7 +69,7 @@ DATABASES = {
     }
 }
 
-# Password
+# Validação de senhas
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -91,7 +94,6 @@ USE_TZ = True
 
 # Arquivos estáticos
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # Arquivos de mídia
 MEDIA_URL = '/media/'
@@ -102,7 +104,9 @@ LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'diary:dashboard'
 LOGOUT_REDIRECT_URL = 'users:login'
 
-
 # Email para desenvolvimento
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'no-reply@finance-diary.com'
+
+# Campo padrão para IDs
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
